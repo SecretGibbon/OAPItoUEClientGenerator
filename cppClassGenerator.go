@@ -236,11 +236,6 @@ func GenerateClass(className, exportPath string, oapi OAPI) error {
 			classContent += responseFuncBodyEnd
 		}
 	}
-
-	err := os.MkdirAll("export", 0644)
-	if err != nil {
-		return err
-	}
 	return os.WriteFile(exportPath+className+".cpp", []byte(classContent), 0644)
 }
 

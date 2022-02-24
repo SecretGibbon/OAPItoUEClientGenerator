@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"os"
 
 	"OAPIClientGenerator"
 )
@@ -31,7 +32,13 @@ func main() {
 		fmt.Println(err)
 	}
 
-	exportPath := "./export"
+	exportPath := "./export/"
+
+
+	err = os.MkdirAll(exportPath, 0644)
+	if err != nil {
+		fmt.Println(err)
+	}
 	err = OAPIClientGenerator.GenerateHeader(*projectName, *className, exportPath, oapi)
 	if err != nil {
 		fmt.Println(err)
@@ -41,8 +48,8 @@ func main() {
 		fmt.Println(err)
 	}
 
-	fmt.Printf("Move %s to your %s/Source/%s/Public/\n", *className+".h", *projectName, *projectName)
-	fmt.Printf("Move %s to your %s/Source/%s/Private/\n\n", *className+".cpp", *projectName, *projectName)
+	fmt.Printf("Move %s to your %s/Source/%s/Public/\n", exportPath+*className+".h", *projectName, *projectName)
+	fmt.Printf("Move %s to your %s/Source/%s/Private/\n\n", exportPath+*className+".cpp", *projectName, *projectName)
 	fmt.Println("!!! IMPORTANT !!!")
 	fmt.Printf("Add \"Http\", \"Json\", \"JsonUtilities\" to PublicDependencyModuleNames in your %s/Source/%s/HTTPClientTest.Build.cs file with:\n\n", *projectName, *projectName)
 }
