@@ -110,7 +110,7 @@ func withUEClassPrefix(name string) string {
 	return "A" + name
 }
 
-func GenerateHeader(projectName, className string, oapi OAPI) error {
+func GenerateHeader(projectName, className, exportPath string, oapi OAPI) error {
 	headerContent := fmt.Sprintf(headerImports, className)
 
 	// generate definitions
@@ -128,7 +128,7 @@ func GenerateHeader(projectName, className string, oapi OAPI) error {
 			funcName, pathArgs := getFuncName(path, method)
 			parameters := getParameters(endpoint.Parameters)
 			headerContent += "\n\tUFUNCTION(BlueprintCallable, Category = OAPI)"
-			headerContent += "\n\tvoid " + funcName + "(" + strings.Join(append(pathArgs, parameters...), ",") + ");"                                                        //todo add params
+			headerContent += "\n\tvoid " + funcName + "(" + strings.Join(append(pathArgs, parameters...), ",") + ");"                                   //todo add params
 			headerContent += "\n\tvoid " + getResponseFuncName(funcName) + "(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);" //todo return values?
 			for responseCode, response := range endpoint.Responses {
 				definitionName := refToDefName(response.Schema.Ref)
@@ -153,7 +153,7 @@ func GenerateHeader(projectName, className string, oapi OAPI) error {
 	void OnOapiError(const FString &text);`
 
 	headerContent += headerEnd
-	return os.WriteFile(className+".h", []byte(headerContent), 0644)
+	return os.WriteFile(exportPath+className+".h", []byte(headerContent), 0644)
 }
 
 func getParameters(parameters []OAPIParameter) []string {
@@ -194,7 +194,7 @@ func getResponseFuncName(funcName string) string {
 	return "On" + funcName + "Response"
 }
 
-func GenerateClass(className string, oapi OAPI) error {
+func GenerateClass(className, exportPath string, oapi OAPI) error {
 	classContent := fmt.Sprintf(classInclude, className+".h")
 
 	// generate constructor
@@ -237,7 +237,11 @@ func GenerateClass(className string, oapi OAPI) error {
 		}
 	}
 
-	return os.WriteFile(className+".cpp", []byte(classContent), 0644)
+	err := os.MkdirAll("export", 0644)
+	if err != nil {
+		return err
+	}
+	return os.WriteFile(exportPath+className+".cpp", []byte(classContent), 0644)
 }
 
 func getUrlWithParameters(host, basePath, path string) string {

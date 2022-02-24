@@ -30,11 +30,13 @@ func main() {
 	if err != nil {
 		fmt.Println(err)
 	}
-	err = OAPIClientGenerator.GenerateHeader(*projectName, *className, oapi)
+
+	exportPath := "./export"
+	err = OAPIClientGenerator.GenerateHeader(*projectName, *className, exportPath, oapi)
 	if err != nil {
 		fmt.Println(err)
 	}
-	err = OAPIClientGenerator.GenerateClass(*className, oapi)
+	err = OAPIClientGenerator.GenerateClass(*className, exportPath, oapi)
 	if err != nil {
 		fmt.Println(err)
 	}
